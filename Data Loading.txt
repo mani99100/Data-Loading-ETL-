@@ -1,0 +1,102 @@
+Data Loading (ETL) — Assignment
+
+Q1. Data Understanding
+
+Issues in the dataset:
+
+>	Duplicate records (O101 appears twice).
+
+>	Missing values (Sales_Amount = Null in O102).
+
+>	Inconsistent data types (Sales_Amount = "Three Thousand" in O104).
+
+>	Mixed date formats (12-01-2024, 2024/01/18).
+
+
+Q2. Primary Key Validation (Order_ID as PK)
+
+>	a) Yes, violation exists.
+>	b) Record causing violation: O101 (appears twice).
+
+
+Q3. Missing Value Analysis
+
+>	Column with missing values: Sales_Amount.
+
+>	Affected record: O102 (Customer C002).
+
+>	Risk: Loading without handling → incorrect sales totals, misleading KPIs, possible SQL errors if column is NOT NULL.
+
+Q4. Data Type Validation
+
+>	Violating record: O104 (Sales_Amount = "Three Thousand").
+
+>	Impact if loaded into DECIMAL column: SQL will reject or fail conversion → ETL job errors.
+
+Q5. Date Format Consistency
+
+a) Formats present:
+
+	DD-MM-YYYY (e.g., 12-01-2024)
+
+	YYYY/MM/DD (e.g., 2024/01/18)
+
+b) Problem: Database expects consistent format; mixed formats cause parsing errors, incorrect sorting, and invalid date conversions.
+
+
+Q6. Load Readiness Decision
+
+	a) No, dataset should not be loaded directly.
+	b) Reasons:
+
+	Duplicate primary key (O101).
+
+	Missing values in Sales_Amount.
+
+	Inconsistent data types and date formats.
+
+Q7. Pre‑Load Validation Checklist
+
+	Check for duplicate primary keys.
+
+	Validate nulls in mandatory columns.
+
+	Ensure data type consistency (numeric, date).
+
+	Standardize date formats.
+
+	Verify referential integrity (Customer_ID exists in master table).
+
+Q8. Cleaning Strategy (Step‑by‑Step)
+
+	Remove duplicates (O101).
+
+	Handle nulls: Impute or reject record (O102).
+
+	Correct data type: Convert "Three Thousand" → 3000.
+
+	Standardize dates: Convert all to YYYY-MM-DD.
+
+	Final validation: Ensure PK uniqueness and numeric consistency.
+
+Q9. Loading Strategy Selection
+
+	a) Incremental Load (preferred).
+	
+	b) Justification:
+
+	Dataset represents daily sales.
+	Incremental avoids reloading entire history.
+	Improves performance and reduces risk of duplication.
+
+Q10. BI Impact Scenario
+
+	a) Incorrect KPI results:
+
+	Total Sales inflated due to duplicate O101.
+	Underreported due to missing Sales_Amount in O102.
+	Failed aggregation due to non‑numeric "Three Thousand".
+	
+	b) Misleading records: O101, O102, O104.
+
+	c) BI tools won’t detect automatically because they aggregate blindly; they assume ETL has already ensured data quality.
